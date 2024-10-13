@@ -26,27 +26,3 @@ jobs:
            docker login -u ${{secrets.Dockerhub_username}} -p ${{secrets.Dockerhub_password}}    
            docker push saki96b/swiggy-clone:latest
 
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      # Step 6: SSH into EC2 instance and deploy the Docker container
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          script: |
-            # Pull the latest image from Docker Hub
-            docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKERHUB_TOKEN }}"
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/swiggy-clone:latest
-
-            # Stop and remove the old container (if any)
-            docker stop swiggy-container || true
-            docker rm swiggy-container || true
-
-            # Start a new container with the latest image
-            docker run -d -p 80:3000 --name swiggy-container ${{ secrets.DOCKERHUB_USERNAME }}/swiggy-clone:latest
