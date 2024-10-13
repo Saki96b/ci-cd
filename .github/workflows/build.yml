@@ -1,0 +1,19 @@
+name: build
+on:
+  push:
+    branches:
+       -  main
+
+jobs: 
+  build:
+     name: Build
+     runs-on: ubuntu-latest
+     steps: 
+       - name: Install Dependencies
+         run: npm install 
+       - name: Docker build and Push
+         run: |
+           docker build -t swiggy-clone .
+           docker tag swiggy-clone saki96b/swiggy-clone:latest
+           docker login -u ${{secrets.Dockerhub_username}} -p $ {{secrets.Dockerhub_token}}    
+           docker push saki96b/swiggy-clone:latest
